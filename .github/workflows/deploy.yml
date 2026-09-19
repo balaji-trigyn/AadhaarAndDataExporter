@@ -1,0 +1,57 @@
+﻿name: Build and Deploy to Azure App Service
+
+on:
+  push:
+    branches:
+      - dev
+      - uat
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x' # Match your framework version
+
+    - name: Restore Dependencies
+      run: dotnet restore
+
+    - name: Build Project
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Publish Output
+      run: dotnet publish --configuration Release --output ./publish
+
+    # DEPLOY TO DEV
+    - name: Deploy to Azure App Service (DEV)
+      if: github.ref == 'refs/heads/dev'
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: 'app-myproject-dev'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_DEV }}
+        package: './publish'
+
+    # DEPLOY TO UAT
+    - name: Deploy to Azure App Service (UAT)
+      if: github.ref == 'refs/heads/uat'
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: 'app-myproject-uat'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_UAT }}
+        package: './publish'
+
+    # DEPLOY TO PROD
+    - name: Deploy to Azure App Service (PROD)
+      if: github.ref == 'refs/heads/main'
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: 'app-myproject-prod'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_PROD }}
+        package: './publish'
