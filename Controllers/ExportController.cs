@@ -59,7 +59,7 @@ namespace AadhaarAndDataExporter.Controllers
             {
                 return BadRequest("Table name is required.");
             }
-
+            //Getting the file name from the table name and appending .csv extension
             var fileName = $"{tableName}.csv";
             var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}_{fileName}");
 
