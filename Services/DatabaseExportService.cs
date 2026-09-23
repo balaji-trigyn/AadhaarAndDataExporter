@@ -27,7 +27,7 @@ namespace AadhaarAndDataExporter.Services
             _logger.LogInformation("Starting streaming export for 1.3M dataset...");
 
             var connStr = _config.GetConnectionString("SourceDb");
-            var query = "SELECT * FROM LargeTable WITH (NOLOCK)";
+            var query = "SELECT * FROM REQUISITION_DETAILS WITH (NOLOCK)";
 
             using var connection = new SqlConnection(connStr);
             using var command = new SqlCommand(query, connection) { CommandTimeout = 600 };
